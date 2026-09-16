@@ -15,15 +15,15 @@ header{background:linear-gradient(135deg,#172b75,#315efb);color:#fff;padding:16p
 .head{max-width:1500px;margin:auto;display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}
 .head h1{margin:0;font-size:20px}.head p{margin:4px 0 0;opacity:.85;font-size:12px}
 .container{max-width:1500px;margin:auto;padding:18px}
-.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
-.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;padding:9px 13px;cursor:pointer;font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:5px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:center}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;padding:9px 13px;cursor:pointer;font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:5px;font-family:inherit}
 .btn:hover{border-color:#98a2b3;background:#fafbfc}
 .btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.primary:hover{background:var(--brand2)}
 .btn.success{background:#ecfdf3;color:var(--ok);border-color:#abefc6}
 .btn.danger{background:#fff1f0;color:var(--danger);border-color:#fecdca}
 .btn.small{padding:6px 9px;font-size:12px}
 .tabs{display:flex;gap:4px;overflow:auto;border-bottom:1px solid var(--line);margin-bottom:18px}
-.tab{padding:10px 13px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-weight:700;white-space:nowrap;border-bottom:3px solid transparent;font-size:13px}
+.tab{padding:10px 13px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-weight:700;white-space:nowrap;border-bottom:3px solid transparent;font-size:13px;font-family:inherit}
 .tab.active{color:var(--brand);border-color:var(--brand)}
 .panel{display:none}.panel.active{display:block}
 .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
@@ -43,7 +43,6 @@ table{width:100%;border-collapse:collapse;font-size:13px}
 th,td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
 th{background:#f8fafc;position:sticky;top:0;z-index:1}
 .tablewrap{overflow:auto;max-height:65vh}
-.pill{display:inline-block;padding:3px 7px;border-radius:999px;background:#eef2ff;color:#3446a3;font-size:11px;font-weight:700;margin:2px}
 .notice{padding:11px 13px;border-radius:9px;margin:10px 0;background:#f2f4f7;font-size:13px}
 .notice.ok{background:#ecfdf3;color:#067647}.notice.err{background:#fef3f2;color:#b42318}.notice.warn{background:#fffaeb;color:#93370d}
 .hidden{display:none!important}.right{float:right}
@@ -56,8 +55,11 @@ th{background:#f8fafc;position:sticky;top:0;z-index:1}
 .break{background:#f2f4f7!important;text-align:center;font-weight:800;color:#667085}
 .conflict{border-left:4px solid var(--danger);background:#fff5f5;padding:9px;margin:6px 0;border-radius:5px;font-size:13px}
 .empty{color:#98a2b3;text-align:center;padding:18px}
+.pill{display:inline-block;padding:3px 7px;border-radius:999px;background:#eef2ff;color:#3446a3;font-size:11px;font-weight:700;margin:2px}
+.pill.red{background:#fee4e2;color:#b42318}.pill.green{background:#dcfae6;color:#067647}.pill.yellow{background:#fef0c7;color:#93370d}
 .footer{color:#98a2b3;text-align:center;padding:25px;font-size:12px}
 .autosave{font-size:11px;color:#98a2b3;margin-left:auto;align-self:center}
+.room-tag{font-size:11px;padding:2px 6px;border-radius:4px;background:#eef2ff;color:#3446a3;margin-left:4px}
 @media print{header,.toolbar,.tabs,.footer,.actions,.btn,.autosave{display:none!important}.panel{display:block!important}.panel:not(#timetable){display:none!important}body{background:#fff}.card{box-shadow:none;border:0;padding:0}}
 </style>
 </head>
@@ -156,7 +158,9 @@ th{background:#f8fafc;position:sticky;top:0;z-index:1}
   <section class="panel" id="rooms">
     <div class="card">
       <h3>Rooms / Labs <button class="btn small primary right" id="btnAddRoom">+ Add Room</button></h3>
+      <div class="notice">Rooms can be assigned per requirement. Use type to distinguish classrooms from labs.</div>
       <div id="roomTable"></div>
+      <div id="roomUsage" style="margin-top:16px"></div>
     </div>
   </section>
 
@@ -177,6 +181,7 @@ th{background:#f8fafc;position:sticky;top:0;z-index:1}
         <div><label>Max consecutive teacher lessons</label><input type="number" id="maxConsecutive" min="1"></div>
         <div><label>Avoid same subject twice/day</label><select id="avoidSame"><option value="true">Yes</option><option value="false">No</option></select></div>
         <div><label>Distribute across week</label><select id="distribute"><option value="true">Yes</option><option value="false">No</option></select></div>
+        <div><label>Auto-assign rooms from type</label><select id="autoRoom"><option value="true">Yes</option><option value="false">No</option></select></div>
       </div><br>
       <button class="btn primary" id="btnSaveConstraints">Save Constraints</button>
     </div>
@@ -224,7 +229,7 @@ th{background:#f8fafc;position:sticky;top:0;z-index:1}
       <div class="card span6">
         <h3>Data Export</h3>
         <button class="btn primary" id="btnExport2">Download Master JSON</button>
-        <p class="muted">JSON contains setup, classes, teachers, subjects, requirements, constraints and schedule.</p>
+        <p class="muted">JSON contains setup, classes, teachers, subjects, rooms, requirements, constraints and schedule.</p>
       </div>
       <div class="card span6">
         <h3>Reset</h3>
@@ -237,7 +242,7 @@ th{background:#f8fafc;position:sticky;top:0;z-index:1}
     <div class="card">
       <h3>Settings</h3>
       <p>Data is stored in your browser using localStorage. No backend needed — works on GitHub Pages.</p>
-      <p class="muted">Workflow: Setup → Classes → Teachers → Subjects → Assignments → Availability/Rooms → Constraints → Generate → Validate.</p>
+      <p class="muted">Workflow: Setup → Classes → Teachers → Subjects → Rooms → Assignments → Availability → Constraints → Generate → Validate.</p>
       <p class="muted">Shortcuts: Ctrl+S save · Ctrl+P print · Ctrl+Enter generate</p>
     </div>
   </section>
@@ -247,63 +252,1090 @@ th{background:#f8fafc;position:sticky;top:0;z-index:1}
 
 <script>
 'use strict';
-const KEY='smartSchoolTimetable_v2';
-const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday'];
-const STRUCT={Monday:[0,1,2,3,4,5,6,7,8],Tuesday:[0,1,2,3,4,5,6,7,8],Wednesday:[0,1,2,3,4,5,6,7,8],Thursday:[0,1,2,3,4,5,6,7,8],Friday:[1,2,3,4,5,6]};
-const BREAK_AFTER={Monday:4,Tuesday:4,Wednesday:4,Thursday:4,Friday:5};
-let db=loadDB();
-const tabs=[['dashboard','Dashboard'],['setup','School Setup'],['classes','Classes'],['classTeachers','Class Teachers'],['teachers','Teachers'],['subjects','Subjects'],['assignments','Teaching Assignments'],['rooms','Rooms'],['availability','Availability'],['constraints','Constraints'],['generate','Generate'],['timetable','Timetable'],['conflicts','Conflicts'],['workload','Workload'],['reports','Reports'],['io','Import / Export'],['settings','Settings']];
 
-function blankDB(){return{school:{name:'The Trust School',campus:'',session:''},days:[...DAYS],timetableStructure:STRUCT,classes:[],classTeachers:[],teachers:[],subjects:[],rooms:[],requirements:[],availability:[],constraints:{maxTeacherDay:8,maxClassDay:9,maxConsecutive:3,avoidSame:true,distribute:true},schedule:[],versions:[]}}
-function loadDB(){try{const x=JSON.parse(localStorage.getItem(KEY));return x?migrate(x):blankDB()}catch(e){return blankDB()}}
-function migrate(x){const b=blankDB();return Object.assign(b,x,{school:Object.assign(b.school,x.school||{}),constraints:Object.assign(b.constraints,x.constraints||{}),schedule:x.schedule||[],requirements:x.requirements||x.assignments||[]})}
-function uid(p){return p+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7)}
-function esc(s){return String(s==null?'':s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
-function saveData(){localStorage.setItem(KEY,JSON.stringify(db));setStatus('Saved locally.','ok');const n=document.getElementById('autosaveNote');if(n)n.textContent='Saved '+new Date().toLocaleTimeString()}
-function setStatus(msg,type){type=type||'';document.getElementById('status').innerHTML=msg?'<div class="notice '+type+'">'+esc(msg)+'</div>':''}
-function nameOf(list,id){const x=list.find(function(y){return y.id===id});return x?x.name:'—'}
-function slotKey(d,p){return d+'|'+p}
-function opt(list,val,placeholder,labelKey){placeholder=placeholder||'Select…';labelKey=labelKey||'name';return '<option value="">'+placeholder+'</option>'+list.map(function(x){return '<option value="'+esc(x.id)+'"'+(x.id===val?' selected':'')+'>'+esc(x[labelKey])+'</option>'}).join('')}
+/* ============================================================
+   CONSTANTS
+============================================================ */
+var KEY = 'smartSchoolTimetable_v2';
+var DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+var STRUCT = {
+  Monday:    [0,1,2,3,4,5,6,7,8],
+  Tuesday:   [0,1,2,3,4,5,6,7,8],
+  Wednesday: [0,1,2,3,4,5,6,7,8],
+  Thursday:  [0,1,2,3,4,5,6,7,8],
+  Friday:    [1,2,3,4,5,6]
+};
+var BREAK_AFTER = { Monday:4, Tuesday:4, Wednesday:4, Thursday:4, Friday:5 };
+var ROOM_TYPES = ['Classroom','Laboratory','Computer Lab','Library','Gymnasium','Auditorium','Outdoor','Other'];
 
-function renderTabs(){document.getElementById('tabs').innerHTML=tabs.map(function(t,i){return '<button class="tab'+(i===0?' active':'')+'" data-panel="'+t[0]+'">'+t[1]+'</button>'}).join('');document.querySelectorAll('.tab').forEach(function(b){b.onclick=function(){showTab(b.dataset.panel,b)}})}
-function showTab(id,btn){document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('active')});const el=document.getElementById(id);if(el)el.classList.add('active');document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});const b=btn||[].slice.call(document.querySelectorAll('.tab')).find(function(x){return x.dataset.panel===id});if(b)b.classList.add('active');renderAll()}
+/* ============================================================
+   DATABASE
+============================================================ */
+var db = loadDB();
 
-function saveSetup(){db.school.name=document.getElementById('schoolName').value.trim();db.school.campus=document.getElementById('campus').value.trim();db.school.session=document.getElementById('session').value.trim();saveData();renderAll()}
-function renderSetup(){document.getElementById('schoolName').value=db.school.name||'';document.getElementById('campus').value=db.school.campus||'';document.getElementById('session').value=db.school.session||'';document.getElementById('schoolTitle').textContent=[db.school.name,db.school.campus,db.school.session].filter(Boolean).join(' • ')||'Constraint-based weekly timetable management';document.getElementById('structureTable').innerHTML='<table><tr><th>Day</th><th>Teaching periods</th><th>Break</th></tr>'+DAYS.map(function(d){return '<tr><td>'+d+'</td><td>'+STRUCT[d].join(', ')+'</td><td>After '+BREAK_AFTER[d]+'</td></tr>'}).join('')+'</table>'}
+function blankDB() {
+  return {
+    school: { name: 'The Trust School', campus: '', session: '' },
+    days: DAYS.slice(),
+    timetableStructure: STRUCT,
+    classes: [],
+    classTeachers: [],
+    teachers: [],
+    subjects: [],
+    rooms: [],
+    requirements: [],
+    availability: [],
+    constraints: {
+      maxTeacherDay: 8,
+      maxClassDay: 9,
+      maxConsecutive: 3,
+      avoidSame: true,
+      distribute: true,
+      autoRoom: true
+    },
+    schedule: [],
+    versions: []
+  };
+}
 
-function addClass(){const name=prompt('Class name, e.g. 6A');if(!name)return;db.classes.push({id:uid('c'),name:name.trim(),grade:(name.trim().match(/^\d+/)||[''])[0],section:'',roomId:''});saveData();renderAll()}
-function editClass(id){const c=db.classes.find(function(x){return x.id===id});if(!c)return;const n=prompt('Class name',c.name);if(n&&n.trim()){c.name=n.trim();saveData();renderAll()}}
-function delClass(id){if(confirm('Delete this class and its requirements/schedule?')){db.classes=db.classes.filter(function(x){return x.id!==id});db.requirements=db.requirements.filter(function(x){return x.classId!==id});db.classTeachers=db.classTeachers.filter(function(x){return x.classId!==id});db.schedule=db.schedule.filter(function(x){return x.classId!==id});saveData();renderAll()}}
-function renderClasses(){document.getElementById('classTable').innerHTML=db.classes.length?'<div class="tablewrap"><table><tr><th>Class</th><th>Grade</th><th>Section</th><th>Class Teacher</th><th>Actions</th></tr>'+db.classes.map(function(c){const ct=db.classTeachers.find(function(x){return x.classId===c.id});const t=db.teachers.find(function(x){return x.id===(ct&&ct.teacherId)});return '<tr><td><b>'+esc(c.name)+'</b></td><td>'+esc(c.grade)+'</td><td>'+esc(c.section)+'</td><td>'+esc(t?t.name:'Not assigned')+'</td><td><div class="actions"><button class="btn small" onclick="editClass(\''+c.id+'\')">Edit</button><button class="btn small danger" onclick="delClass(\''+c.id+'\')">Delete</button></div></td></tr>'}).join('')+'</table></div>':'<div class="empty">No classes yet. Click “Add Class” to begin.</div>'}
+function loadDB() {
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (!raw) return blankDB();
+    return migrate(JSON.parse(raw));
+  } catch (e) {
+    console.warn('DB load failed, using blank:', e);
+    return blankDB();
+  }
+}
 
-function renderClassTeachers(){document.getElementById('classTeacherTable').innerHTML=db.classes.length?'<div class="tablewrap"><table><tr><th>Class</th><th>Class Teacher</th></tr>'+db.classes.map(function(c){const ct=db.classTeachers.find(function(x){return x.classId===c.id});return '<tr><td><b>'+esc(c.name)+'</b></td><td><select onchange="setClassTeacher(\''+c.id+'\',this.value)">'+opt(db.teachers,ct&&ct.teacherId,'No class teacher')+'</select></td></tr>'}).join('')+'</table></div>':'<div class="empty">Add classes first.</div>'}
-function setClassTeacher(classId,teacherId){db.classTeachers=db.classTeachers.filter(function(x){return x.classId!==classId});if(teacherId)db.classTeachers.push({id:uid('ct'),classId:classId,teacherId:teacherId});saveData();renderAll()}
+function migrate(x) {
+  var b = blankDB();
+  var out = Object.assign(b, x || {});
+  out.school = Object.assign(b.school, x.school || {});
+  out.constraints = Object.assign(b.constraints, x.constraints || {});
+  out.schedule = x.schedule || [];
+  out.requirements = x.requirements || x.assignments || [];
+  out.rooms = x.rooms || [];
+  // ensure room entries have type
+  out.rooms.forEach(function(r){ if (r.type === undefined) r.type = ''; });
+  return out;
+}
 
-function addTeacher(){const name=prompt('Teacher name');if(!name)return;db.teachers.push({id:uid('t'),name:name.trim(),code:'',subjects:[]});saveData();renderAll()}
-function editTeacher(id){const t=db.teachers.find(function(x){return x.id===id});const n=prompt('Teacher name',t.name);if(n&&n.trim()){t.name=n.trim();saveData();renderAll()}}
-function delTeacher(id){if(confirm('Delete teacher and related requirements?')){db.teachers=db.teachers.filter(function(x){return x.id!==id});db.requirements=db.requirements.filter(function(x){return x.teacherId!==id});db.classTeachers=db.classTeachers.filter(function(x){return x.teacherId!==id});db.schedule=db.schedule.filter(function(x){return x.teacherId!==id});saveData();renderAll()}}
-function renderTeachers(){document.getElementById('teacherTable').innerHTML=db.teachers.length?'<div class="tablewrap"><table><tr><th>Teacher</th><th>Subjects they can teach</th><th>Actions</th></tr>'+db.teachers.map(function(t){return '<tr><td><b>'+esc(t.name)+'</b></td><td><select multiple size="3" onchange="setTeacherSubjects(\''+t.id+'\',this)">'+db.subjects.map(function(s){return '<option value="'+s.id+'"'+((t.subjects||[]).indexOf(s.id)>=0?' selected':'')+'>'+esc(s.name)+'</option>'}).join('')+'</select></td><td><button class="btn small" onclick="editTeacher(\''+t.id+'\')">Edit</button> <button class="btn small danger" onclick="delTeacher(\''+t.id+'\')">Delete</button></td></tr>'}).join('')+'</table></div>':'<div class="empty">Add teachers to begin.</div>'}
-function setTeacherSubjects(id,el){const t=db.teachers.find(function(x){return x.id===id});t.subjects=[].slice.call(el.selectedOptions).map(function(x){return x.value});saveData()}
+/* ============================================================
+   UTILITIES
+============================================================ */
+function uid(p) {
+  return p + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,7);
+}
 
-function addSubject(){const name=prompt('Subject name');if(!name)return;db.subjects.push({id:uid('s'),name:name.trim(),code:'',doublePeriod:false});saveData();renderAll()}
-function editSubject(id){const s=db.subjects.find(function(x){return x.id===id});const n=prompt('Subject name',s.name);if(n&&n.trim()){s.name=n.trim();saveData();renderAll()}}
-function delSubject(id){if(confirm('Delete subject and its requirements/schedule?')){db.subjects=db.subjects.filter(function(x){return x.id!==id});db.requirements=db.requirements.filter(function(x){return x.subjectId!==id});db.schedule=db.schedule.filter(function(x){return x.subjectId!==id});db.teachers.forEach(function(t){t.subjects=(t.subjects||[]).filter(function(x){return x!==id})});saveData();renderAll()}}
-function renderSubjects(){document.getElementById('subjectTable').innerHTML=db.subjects.length?'<table><tr><th>Subject</th><th>Code</th><th>Double</th><th>Actions</th></tr>'+db.subjects.map(function(s){return '<tr><td>'+esc(s.name)+'</td><td>'+esc(s.code||'')+'</td><td><input type="checkbox"'+(s.doublePeriod?' checked':'')+' onchange="toggleDouble(\''+s.id+'\',this.checked)"></td><td><button class="btn small" onclick="editSubject(\''+s.id+'\')">Edit</button> <button class="btn small danger" onclick="delSubject(\''+s.id+'\')">Delete</button></td></tr>'}).join('')+'</table>':'<div class="empty">Add subjects first.</div>'}
-function toggleDouble(id,v){db.subjects.find(function(x){return x.id===id}).doublePeriod=v;saveData()}
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>'"]/g, function(c){
+    return { '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[c];
+  });
+}
 
-function addRequirement(){if(!db.classes.length||!db.subjects.length||!db.teachers.length){alert('Add classes, subjects and teachers first.');return}
- const c=prompt('Class name:\n'+db.classes.map(function(x){return x.name}).join(', '));const cl=db.classes.find(function(x){return x.name.toLowerCase()===(c||'').trim().toLowerCase()});if(!cl)return alert('Class not found.');
- const sn=prompt('Subject:\n'+db.subjects.map(function(x){return x.name}).join(', '));const s=db.subjects.find(function(x){return x.name.toLowerCase()===(sn||'').trim().toLowerCase()});if(!s)return alert('Subject not found.');
- const tn=prompt('Teacher:\n'+db.teachers.map(function(x){return x.name}).join(', '));const t=db.teachers.find(function(x){return x.name.toLowerCase()===(tn||'').trim().toLowerCase()});if(!t)return alert('Teacher not found.');
- const n=Number(prompt('Lessons per week','5'));if(!isFinite(n)||n<1)return;
- db.requirements.push({id:uid('r'),classId:cl.id,subjectId:s.id,teacherId:t.id,weeklyLessons:Math.floor(n),roomId:''});saveData();renderAll()}
-function renderAssignments(){document.getElementById('assignmentTable').innerHTML=db.requirements.length?'<div class="tablewrap"><table><tr><th>Class</th><th>Subject</th><th>Teacher</th><th>Weekly</th><th>Room</th><th>Actions</th></tr>'+db.requirements.map(function(r){return '<tr><td>'+esc(nameOf(db.classes,r.classId))+'</td><td>'+esc(nameOf(db.subjects,r.subjectId))+'</td><td>'+esc(nameOf(db.teachers,r.teacherId))+'</td><td><input type="number" min="1" value="'+r.weeklyLessons+'" style="width:80px" onchange="changeReq(\''+r.id+'\',this.value)"></td><td><select onchange="changeReqRoom(\''+r.id+'\',this.value)">'+opt(db.rooms,r.roomId,'Any room')+'</select></td><td><button class="btn small danger" onclick="delReq(\''+r.id+'\')">Delete</button></td></tr>'}).join('')+'</table></div>':'<div class="empty">No weekly requirements yet.</div>'}
-function changeReq(id,v){const r=db.requirements.find(function(x){return x.id===id});r.weeklyLessons=Math.max(1,parseInt(v)||1);saveData()}
-function changeReqRoom(id,v){db.requirements.find(function(x){return x.id===id}).roomId=v;saveData()}
-function delReq(id){db.requirements=db.requirements.filter(function(x){return x.id!==id});db.schedule=[];saveData();renderAll()}
+function nameOf(list, id) {
+  var x = list.find(function(y){ return y.id === id; });
+  return x ? x.name : '—';
+}
 
-function addRoom(){const name=prompt('Room/Lab name');if(!name)return;db.rooms.push({id:uid('room'),name:name.trim(),type:''});saveData();renderAll()}
-function renderRooms(){const el=document.getElementById('roomTable');if(!el)return;el.innerHTML=db.rooms.length?'<table><tr><th>Room</th><th>Type</th><th></th></tr>'+db.rooms.map(function(r){return '<tr><td>'+esc(r.name)+'</td><td>'+esc(r.type||'')+'</td><td><button class="btn small danger" onclick="delRoom(\''+r.id+'\')">Delete</button></td></tr>'}).join('')+'</table>':'<div class="empty">No rooms. Requirements may use Any room.</div>'}
-function delRoom(id){db.rooms=db.rooms.filter(function(x){return x.id!==id});db.requirements.forEach(function(r){if(r.roomId===id)r.roomId=''});db.schedule.forEach(function(x){if(x.roomId===id)x.roomId=''});saveData();renderAll()}
+function slotKey(d, p) { return d + '|' + p; }
 
-function renderAvailability(){const rows=db.teachers.map(function(t){return '<tr><td><b>'+esc(t.name)+'</b></td>'+DAYS.map(function(d){return '<td>'+STRUCT[d].map(function(p){const k=t.id+'|'+d+'|'+p;const on=db.availability.some(function(a){return a.key===k});return '<label style="display:inline-flex;align-items:center;gap:2px;margin:2px;font-size:10px"><input type="
+function opt(list, val, placeholder, labelKey) {
+  placeholder = placeholder || 'Select…';
+  labelKey = labelKey || 'name';
+  var head = '<option value="">' + esc(placeholder) + '</option>';
+  var body = list.map(function(x){
+    return '<option value="' + esc(x.id) + '"' + (x.id === val ? ' selected' : '') + '>' + esc(x[labelKey]) + '</option>';
+  }).join('');
+  return head + body;
+}
+
+/* ============================================================
+   STATUS / PERSISTENCE
+============================================================ */
+function setStatus(msg, type) {
+  type = type || '';
+  var el = document.getElementById('status');
+  if (!el) return;
+  el.innerHTML = msg ? '<div class="notice ' + type + '">' + esc(msg) + '</div>' : '';
+}
+
+function saveData() {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(db));
+    var n = document.getElementById('autosaveNote');
+    if (n) n.textContent = 'Saved ' + new Date().toLocaleTimeString();
+    setStatus('Saved locally.', 'ok');
+  } catch (e) {
+    setStatus('Save failed: ' + e.message, 'err');
+  }
+}
+
+/* ============================================================
+   TABS
+============================================================ */
+var tabs = [
+  ['dashboard','Dashboard'], ['setup','School Setup'], ['classes','Classes'],
+  ['classTeachers','Class Teachers'], ['teachers','Teachers'], ['subjects','Subjects'],
+  ['assignments','Teaching Assignments'], ['rooms','Rooms'], ['availability','Availability'],
+  ['constraints','Constraints'], ['generate','Generate'], ['timetable','Timetable'],
+  ['conflicts','Conflicts'], ['workload','Workload'], ['reports','Reports'],
+  ['io','Import / Export'], ['settings','Settings']
+];
+
+function renderTabs() {
+  var el = document.getElementById('tabs');
+  if (!el) return;
+  el.innerHTML = tabs.map(function(t, i){
+    return '<button class="tab' + (i === 0 ? ' active' : '') + '" data-panel="' + t[0] + '">' + t[1] + '</button>';
+  }).join('');
+  el.querySelectorAll('.tab').forEach(function(b){
+    b.addEventListener('click', function(){ showTab(b.dataset.panel, b); });
+  });
+}
+
+function showTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(function(x){ x.classList.remove('active'); });
+  var el = document.getElementById(id);
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.tab').forEach(function(x){ x.classList.remove('active'); });
+  var b = btn || Array.prototype.slice.call(document.querySelectorAll('.tab')).find(function(x){ return x.dataset.panel === id; });
+  if (b) b.classList.add('active');
+  renderAll();
+}
+
+/* ============================================================
+   SCHOOL SETUP
+============================================================ */
+function saveSetup() {
+  db.school.name = document.getElementById('schoolName').value.trim();
+  db.school.campus = document.getElementById('campus').value.trim();
+  db.school.session = document.getElementById('session').value.trim();
+  saveData();
+  renderAll();
+}
+
+function renderSetup() {
+  var sName = document.getElementById('schoolName');
+  if (sName) sName.value = db.school.name || '';
+  var cEl = document.getElementById('campus');
+  if (cEl) cEl.value = db.school.campus || '';
+  var ssEl = document.getElementById('session');
+  if (ssEl) ssEl.value = db.school.session || '';
+
+  var title = document.getElementById('schoolTitle');
+  if (title) {
+    var parts = [db.school.name, db.school.campus, db.school.session].filter(Boolean);
+    title.textContent = parts.join(' • ') || 'Constraint-based weekly timetable management';
+  }
+
+  var st = document.getElementById('structureTable');
+  if (st) {
+    st.innerHTML = '<table><tr><th>Day</th><th>Teaching periods</th><th>Break</th></tr>' +
+      DAYS.map(function(d){
+        return '<tr><td>' + d + '</td><td>' + STRUCT[d].join(', ') + '</td><td>After ' + BREAK_AFTER[d] + '</td></tr>';
+      }).join('') + '</table>';
+  }
+}
+
+/* ============================================================
+   CLASSES
+============================================================ */
+function addClass() {
+  var name = prompt('Class name, e.g. 6A');
+  if (!name) return;
+  var trimmed = name.trim();
+  if (!trimmed) return;
+  if (db.classes.some(function(c){ return c.name.toLowerCase() === trimmed.toLowerCase(); })) {
+    alert('A class with this name already exists.');
+    return;
+  }
+  db.classes.push({ id: uid('c'), name: trimmed, grade: (trimmed.match(/^\d+/) || [''])[0], section: '', roomId: '' });
+  saveData();
+  renderAll();
+}
+
+function editClass(id) {
+  var c = db.classes.find(function(x){ return x.id === id; });
+  if (!c) return;
+  var n = prompt('Class name', c.name);
+  if (!n || !n.trim()) return;
+  c.name = n.trim();
+  var g = prompt('Grade (optional)', c.grade || '');
+  if (g !== null) c.grade = g.trim();
+  var sec = prompt('Section (optional)', c.section || '');
+  if (sec !== null) c.section = sec.trim();
+  saveData();
+  renderAll();
+}
+
+function delClass(id) {
+  if (!confirm('Delete this class and its requirements/schedule?')) return;
+  db.classes = db.classes.filter(function(x){ return x.id !== id; });
+  db.requirements = db.requirements.filter(function(x){ return x.classId !== id; });
+  db.classTeachers = db.classTeachers.filter(function(x){ return x.classId !== id; });
+  db.schedule = db.schedule.filter(function(x){ return x.classId !== id; });
+  saveData();
+  renderAll();
+}
+
+function renderClasses() {
+  var el = document.getElementById('classTable');
+  if (!el) return;
+  if (!db.classes.length) {
+    el.innerHTML = '<div class="empty">No classes yet. Click “Add Class” to begin.</div>';
+    return;
+  }
+  var rows = db.classes.map(function(c){
+    var ct = db.classTeachers.find(function(x){ return x.classId === c.id; });
+    var t = db.teachers.find(function(x){ return x.id === (ct && ct.teacherId); });
+    return '<tr>' +
+      '<td><b>' + esc(c.name) + '</b></td>' +
+      '<td>' + esc(c.grade) + '</td>' +
+      '<td>' + esc(c.section) + '</td>' +
+      '<td>' + esc(t ? t.name : 'Not assigned') + '</td>' +
+      '<td><div class="actions">' +
+        '<button class="btn small" data-act="edit-class" data-id="' + c.id + '">Edit</button>' +
+        '<button class="btn small danger" data-act="del-class" data-id="' + c.id + '">Delete</button>' +
+      '</div></td></tr>';
+  }).join('');
+  el.innerHTML = '<div class="tablewrap"><table><tr><th>Class</th><th>Grade</th><th>Section</th><th>Class Teacher</th><th>Actions</th></tr>' + rows + '</table></div>';
+  el.querySelectorAll('[data-act="edit-class"]').forEach(function(b){ b.onclick = function(){ editClass(b.dataset.id); }; });
+  el.querySelectorAll('[data-act="del-class"]').forEach(function(b){ b.onclick = function(){ delClass(b.dataset.id); }; });
+}
+
+/* ============================================================
+   CLASS TEACHERS
+============================================================ */
+function setClassTeacher(classId, teacherId) {
+  db.classTeachers = db.classTeachers.filter(function(x){ return x.classId !== classId; });
+  if (teacherId) db.classTeachers.push({ id: uid('ct'), classId: classId, teacherId: teacherId });
+  saveData();
+  renderAll();
+}
+
+function renderClassTeachers() {
+  var el = document.getElementById('classTeacherTable');
+  if (!el) return;
+  if (!db.classes.length) { el.innerHTML = '<div class="empty">Add classes first.</div>'; return; }
+  var rows = db.classes.map(function(c){
+    var ct = db.classTeachers.find(function(x){ return x.classId === c.id; });
+    return '<tr><td><b>' + esc(c.name) + '</b></td><td><select data-class="' + c.id + '">' + opt(db.teachers, ct && ct.teacherId, 'No class teacher') + '</select></td></tr>';
+  }).join('');
+  el.innerHTML = '<div class="tablewrap"><table><tr><th>Class</th><th>Class Teacher</th></tr>' + rows + '</table></div>';
+  el.querySelectorAll('select[data-class]').forEach(function(sel){
+    sel.onchange = function(){ setClassTeacher(sel.dataset.class, sel.value); };
+  });
+}
+
+/* ============================================================
+   TEACHERS
+============================================================ */
+function addTeacher() {
+  var name = prompt('Teacher name');
+  if (!name || !name.trim()) return;
+  db.teachers.push({ id: uid('t'), name: name.trim(), code: '', subjects: [] });
+  saveData();
+  renderAll();
+}
+
+function editTeacher(id) {
+  var t = db.teachers.find(function(x){ return x.id === id; });
+  if (!t) return;
+  var n = prompt('Teacher name', t.name);
+  if (!n || !n.trim()) return;
+  t.name = n.trim();
+  saveData();
+  renderAll();
+}
+
+function delTeacher(id) {
+  if (!confirm('Delete teacher and related requirements?')) return;
+  db.teachers = db.teachers.filter(function(x){ return x.id !== id; });
+  db.requirements = db.requirements.filter(function(x){ return x.teacherId !== id; });
+  db.classTeachers = db.classTeachers.filter(function(x){ return x.teacherId !== id; });
+  db.schedule = db.schedule.filter(function(x){ return x.teacherId !== id; });
+  saveData();
+  renderAll();
+}
+
+function setTeacherSubjects(id, el) {
+  var t = db.teachers.find(function(x){ return x.id === id; });
+  if (!t) return;
+  t.subjects = Array.prototype.slice.call(el.selectedOptions).map(function(x){ return x.value; });
+  saveData();
+}
+
+function renderTeachers() {
+  var el = document.getElementById('teacherTable');
+  if (!el) return;
+  if (!db.teachers.length) { el.innerHTML = '<div class="empty">Add teachers to begin.</div>'; return; }
+  var rows = db.teachers.map(function(t){
+    var subs = db.subjects.map(function(s){
+      return '<option value="' + s.id + '"' + ((t.subjects || []).indexOf(s.id) >= 0 ? ' selected' : '') + '>' + esc(s.name) + '</option>';
+    }).join('');
+    return '<tr>' +
+      '<td><b>' + esc(t.name) + '</b></td>' +
+      '<td><select multiple size="3" data-teacher="' + t.id + '">' + subs + '</select></td>' +
+      '<td><div class="actions">' +
+        '<button class="btn small" data-act="edit-teacher" data-id="' + t.id + '">Edit</button>' +
+        '<button class="btn small danger" data-act="del-teacher" data-id="' + t.id + '">Delete</button>' +
+      '</div></td></tr>';
+  }).join('');
+  el.innerHTML = '<div class="tablewrap"><table><tr><th>Teacher</th><th>Subjects they can teach</th><th>Actions</th></tr>' + rows + '</table></div>';
+  el.querySelectorAll('select[data-teacher]').forEach(function(sel){
+    sel.onchange = function(){ setTeacherSubjects(sel.dataset.teacher, sel); };
+  });
+  el.querySelectorAll('[data-act="edit-teacher"]').forEach(function(b){ b.onclick = function(){ editTeacher(b.dataset.id); }; });
+  el.querySelectorAll('[data-act="del-teacher"]').forEach(function(b){ b.onclick = function(){ delTeacher(b.dataset.id); }; });
+}
+
+/* ============================================================
+   SUBJECTS
+============================================================ */
+function addSubject() {
+  var name = prompt('Subject name');
+  if (!name || !name.trim()) return;
+  db.subjects.push({ id: uid('s'), name: name.trim(), code: '', doublePeriod: false });
+  saveData();
+  renderAll();
+}
+
+function editSubject(id) {
+  var s = db.subjects.find(function(x){ return x.id === id; });
+  if (!s) return;
+  var n = prompt('Subject name', s.name);
+  if (!n || !n.trim()) return;
+  s.name = n.trim();
+  saveData();
+  renderAll();
+}
+
+function delSubject(id) {
+  if (!confirm('Delete subject and its requirements/schedule?')) return;
+  db.subjects = db.subjects.filter(function(x){ return x.id !== id; });
+  db.requirements = db.requirements.filter(function(x){ return x.subjectId !== id; });
+  db.schedule = db.schedule.filter(function(x){ return x.subjectId !== id; });
+  db.teachers.forEach(function(t){ t.subjects = (t.subjects || []).filter(function(x){ return x !== id; }); });
+  saveData();
+  renderAll();
+}
+
+function toggleDouble(id, v) {
+  var s = db.subjects.find(function(x){ return x.id === id; });
+  if (s) s.doublePeriod = v;
+  saveData();
+}
+
+function renderSubjects() {
+  var el = document.getElementById('subjectTable');
+  if (!el) return;
+  if (!db.subjects.length) { el.innerHTML = '<div class="empty">Add subjects first.</div>'; return; }
+  var rows = db.subjects.map(function(s){
+    return '<tr>' +
+      '<td>' + esc(s.name) + '</td>' +
+      '<td>' + esc(s.code || '') + '</td>' +
+      '<td><input type="checkbox"' + (s.doublePeriod ? ' checked' : '') + ' data-sub="' + s.id + '"></td>' +
+      '<td><div class="actions">' +
+        '<button class="btn small" data-act="edit-subject" data-id="' + s.id + '">Edit</button>' +
+        '<button class="btn small danger" data-act="del-subject" data-id="' + s.id + '">Delete</button>' +
+      '</div></td></tr>';
+  }).join('');
+  el.innerHTML = '<table><tr><th>Subject</th><th>Code</th><th>Double</th><th>Actions</th></tr>' + rows + '</table>';
+  el.querySelectorAll('input[data-sub]').forEach(function(cb){
+    cb.onchange = function(){ toggleDouble(cb.dataset.sub, cb.checked); };
+  });
+  el.querySelectorAll('[data-act="edit-subject"]').forEach(function(b){ b.onclick = function(){ editSubject(b.dataset.id); }; });
+  el.querySelectorAll('[data-act="del-subject"]').forEach(function(b){ b.onclick = function(){ delSubject(b.dataset.id); }; });
+}
+
+/* ============================================================
+   ROOMS — IMPROVED
+============================================================ */
+function addRoom() {
+  var name = prompt('Room / Lab name (e.g. Room 101, Science Lab)');
+  if (!name || !name.trim()) return;
+  var trimmed = name.trim();
+  if (db.rooms.some(function(r){ return r.name.toLowerCase() === trimmed.toLowerCase(); })) {
+    alert('A room with this name already exists.');
+    return;
+  }
+  var type = prompt('Room type:\n' + ROOM_TYPES.join(', '), 'Classroom');
+  if (type === null) return;
+  type = (type || '').trim() || 'Classroom';
+  var capacity = prompt('Capacity (optional, number of students)', '');
+  db.rooms.push({
+    id: uid('room'),
+    name: trimmed,
+    type: type,
+    capacity: capacity && !isNaN(parseInt(capacity, 10)) ? parseInt(capacity, 10) : null
+  });
+  saveData();
+  renderAll();
+  setStatus('Room added: ' + trimmed + ' (' + type + ')', 'ok');
+}
+
+function editRoom(id) {
+  var r = db.rooms.find(function(x){ return x.id === id; });
+  if (!r) return;
+  var name = prompt('Room name', r.name);
+  if (name === null) return;
+  if (!name.trim()) return alert('Name cannot be empty.');
+  var newName = name.trim();
+  if (db.rooms.some(function(x){ return x.id !== id && x.name.toLowerCase() === newName.toLowerCase(); })) {
+    return alert('Another room already uses that name.');
+  }
+  r.name = newName;
+
+  var type = prompt('Room type:\n' + ROOM_TYPES.join(', '), r.type || 'Classroom');
+  if (type !== null) r.type = type.trim() || r.type;
+
+  var cap = prompt('Capacity (blank to clear)', r.capacity == null ? '' : r.capacity);
+  if (cap !== null) {
+    if (cap.trim() === '') r.capacity = null;
+    else if (!isNaN(parseInt(cap, 10))) r.capacity = parseInt(cap, 10);
+  }
+
+  saveData();
+  renderAll();
+  setStatus('Room updated.', 'ok');
+}
+
+function delRoom(id) {
+  var r = db.rooms.find(function(x){ return x.id === id; });
+  if (!r) return;
+  var inUse = db.requirements.filter(function(x){ return x.roomId === id; }).length;
+  var msg = 'Delete room "' + r.name + '"?';
+  if (inUse) msg += '\n\n' + inUse + ' requirement(s) reference this room. They will be set to "Any room".';
+  if (!confirm(msg)) return;
+
+  db.rooms = db.rooms.filter(function(x){ return x.id !== id; });
+  db.requirements.forEach(function(x){ if (x.roomId === id) x.roomId = ''; });
+  db.schedule.forEach(function(x){ if (x.roomId === id) x.roomId = ''; });
+  saveData();
+  renderAll();
+  setStatus('Room deleted.', 'ok');
+}
+
+function renderRooms() {
+  var el = document.getElementById('roomTable');
+  if (!el) return;
+  if (!db.rooms.length) {
+    el.innerHTML = '<div class="empty">No rooms yet. Click “+ Add Room” to create classrooms or labs.</div>';
+    renderRoomUsage();
+    return;
+  }
+  var rows = db.rooms.map(function(r){
+    var typePill = r.type
+      ? '<span class="pill' + (r.type === 'Laboratory' || r.type === 'Computer Lab' ? ' green' : '') + '">' + esc(r.type) + '</span>'
+      : '<span class="pill">—</span>';
+    var capPill = (r.capacity != null && r.capacity > 0)
+      ? '<span class="pill yellow">' + r.capacity + ' seats</span>'
+      : '<span class="muted">—</span>';
+    var used = db.requirements.filter(function(x){ return x.roomId === r.id; }).length;
+    var usedPill = used
+      ? '<span class="pill">' + used + ' req.</span>'
+      : '<span class="muted">0</span>';
+    return '<tr>' +
+      '<td><b>' + esc(r.name) + '</b></td>' +
+      '<td>' + typePill + '</td>' +
+      '<td>' + capPill + '</td>' +
+      '<td>' + usedPill + '</td>' +
+      '<td><div class="actions">' +
+        '<button class="btn small" data-act="edit-room" data-id="' + r.id + '">Edit</button>' +
+        '<button class="btn small danger" data-act="del-room" data-id="' + r.id + '">Delete</button>' +
+      '</div></td></tr>';
+  }).join('');
+  el.innerHTML = '<div class="tablewrap"><table>' +
+    '<tr><th>Room</th><th>Type</th><th>Capacity</th><th>Used by</th><th>Actions</th></tr>' +
+    rows + '</table></div>';
+
+  el.querySelectorAll('[data-act="edit-room"]').forEach(function(b){ b.onclick = function(){ editRoom(b.dataset.id); }; });
+  el.querySelectorAll('[data-act="del-room"]').forEach(function(b){ b.onclick = function(){ delRoom(b.dataset.id); }; });
+
+  renderRoomUsage();
+}
+
+function renderRoomUsage() {
+  var el = document.getElementById('roomUsage');
+  if (!el) return;
+  if (!db.schedule.length) {
+    el.innerHTML = '';
+    return;
+  }
+  // Compute utilization: total scheduled periods per room / total available periods
+  var totalSlots = 0;
+  DAYS.forEach(function(d){ totalSlots += STRUCT[d].length; });
+
+  var usage = db.rooms.map(function(r){
+    var periods = db.schedule.filter(function(x){ return x.roomId === r.id; }).length;
+    var pct = totalSlots ? Math.round((periods / totalSlots) * 100) : 0;
+    return { room: r, periods: periods, pct: pct };
+  });
+
+  var unassigned = db.schedule.filter(function(x){ return !x.roomId; }).length;
+
+  var rows = usage.map(function(u){
+    var barColor = u.pct > 85 ? '#d92d20' : u.pct > 60 ? '#b54708' : '#027a48';
+    return '<tr>' +
+      '<td>' + esc(u.room.name) + '</td>' +
+      '<td>' + u.periods + '</td>' +
+      '<td style="min-width:160px">' +
+        '<div style="background:#eef2f6;border-radius:6px;height:12px;overflow:hidden">' +
+          '<div style="height:100%;width:' + u.pct + '%;background:' + barColor + '"></div>' +
+        '</div>' +
+        '<small class="muted">' + u.pct + '% used</small>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+
+  el.innerHTML = '<h3 style="margin-top:8px">Room Utilisation</h3>' +
+    '<div class="tablewrap"><table>' +
+    '<tr><th>Room</th><th>Periods assigned</th><th>Weekly usage</th></tr>' +
+    (rows || '<tr><td colspan="3" class="empty">No rooms.</td></tr>') +
+    '</table></div>' +
+    (unassigned
+      ? '<div class="notice warn" style="margin-top:10px">' + unassigned + ' scheduled lesson(s) have no room assigned. Enable “Auto-assign rooms from type” in Constraints, or set rooms per requirement.</div>'
+      : '');
+}
+
+/* ============================================================
+   REQUIREMENTS
+============================================================ */
+function addRequirement() {
+  if (!db.classes.length || !db.subjects.length || !db.teachers.length) {
+    alert('Add classes, subjects and teachers first.');
+    return;
+  }
+  var cName = prompt('Class name:\n' + db.classes.map(function(x){ return x.name; }).join(', '));
+  var cl = db.classes.find(function(x){ return x.name.toLowerCase() === (cName || '').trim().toLowerCase(); });
+  if (!cl) return alert('Class not found.');
+
+  var sName = prompt('Subject:\n' + db.subjects.map(function(x){ return x.name; }).join(', '));
+  var s = db.subjects.find(function(x){ return x.name.toLowerCase() === (sName || '').trim().toLowerCase(); });
+  if (!s) return alert('Subject not found.');
+
+  var tName = prompt('Teacher:\n' + db.teachers.map(function(x){ return x.name; }).join(', '));
+  var t = db.teachers.find(function(x){ return x.name.toLowerCase() === (tName || '').trim().toLowerCase(); });
+  if (!t) return alert('Teacher not found.');
+
+  var n = Number(prompt('Lessons per week', '5'));
+  if (!isFinite(n) || n < 1) return;
+
+  db.requirements.push({
+    id: uid('r'),
+    classId: cl.id,
+    subjectId: s.id,
+    teacherId: t.id,
+    weeklyLessons: Math.floor(n),
+    roomId: ''
+  });
+  saveData();
+  renderAll();
+}
+
+function changeReq(id, v) {
+  var r = db.requirements.find(function(x){ return x.id === id; });
+  if (!r) return;
+  r.weeklyLessons = Math.max(1, parseInt(v, 10) || 1);
+  saveData();
+}
+
+function changeReqRoom(id, v) {
+  var r = db.requirements.find(function(x){ return x.id === id; });
+  if (!r) return;
+  r.roomId = v || '';
+  saveData();
+}
+
+function delReq(id) {
+  db.requirements = db.requirements.filter(function(x){ return x.id !== id; });
+  db.schedule = [];
+  saveData();
+  renderAll();
+}
+
+function renderAssignments() {
+  var el = document.getElementById('assignmentTable');
+  if (!el) return;
+  if (!db.requirements.length) {
+    el.innerHTML = '<div class="empty">No weekly requirements yet. Click “+ Add Requirement”.</div>';
+    return;
+  }
+  var rows = db.requirements.map(function(r){
+    var roomOpts = opt(db.rooms, r.roomId, 'Any room');
+    return '<tr>' +
+      '<td>' + esc(nameOf(db.classes, r.classId)) + '</td>' +
+      '<td>' + esc(nameOf(db.subjects, r.subjectId)) + '</td>' +
+      '<td>' + esc(nameOf(db.teachers, r.teacherId)) + '</td>' +
+      '<td><input type="number" min="1" value="' + r.weeklyLessons + '" style="width:80px" data-req="' + r.id + '"></td>' +
+      '<td><select data-reqroom="' + r.id + '">' + roomOpts + '</select></td>' +
+      '<td><button class="btn small danger" data-act="del-req" data-id="' + r.id + '">Delete</button></td>' +
+    '</tr>';
+  }).join('');
+  el.innerHTML = '<div class="tablewrap"><table>' +
+    '<tr><th>Class</th><th>Subject</th><th>Teacher</th><th>Weekly</th><th>Room</th><th>Actions</th></tr>' +
+    rows + '</table></div>';
+
+  el.querySelectorAll('input[data-req]').forEach(function(inp){
+    inp.onchange = function(){ changeReq(inp.dataset.req, inp.value); };
+  });
+  el.querySelectorAll('select[data-reqroom]').forEach(function(sel){
+    sel.onchange = function(){ changeReqRoom(sel.dataset.reqroom, sel.value); };
+  });
+  el.querySelectorAll('[data-act="del-req"]').forEach(function(b){
+    b.onclick = function(){ delReq(b.dataset.id); };
+  });
+}
+
+/* ============================================================
+   AVAILABILITY
+============================================================ */
+function toggleAvail(t, d, p, v) {
+  var key = t + '|' + d + '|' + p;
+  db.availability = db.availability.filter(function(a){ return a.key !== key; });
+  if (v) db.availability.push({ id: uid('a'), key: key, teacherId: t, day: d, period: p, available: false });
+  saveData();
+}
+
+function blocked(t, d, p) {
+  return db.availability.some(function(a){
+    return a.teacherId === t && a.day === d && a.period === p && a.available === false;
+  });
+}
+
+function renderAvailability() {
+  var el = document.getElementById('availabilityTable');
+  if (!el) return;
+  if (!db.teachers.length) { el.innerHTML = '<div class="empty">Add teachers first.</div>'; return; }
+
+  var rows = db.teachers.map(function(t){
+    var cells = DAYS.map(function(d){
+      var inner = STRUCT[d].map(function(p){
+        var k = t.id + '|' + d + '|' + p;
+        var on = db.availability.some(function(a){ return a.key === k; });
+        return '<label style="display:inline-flex;align-items:center;gap:2px;margin:2px;font-size:10px">' +
+          '<input type="checkbox"' + (on ? ' checked' : '') + ' data-avail="' + t.id + '|' + d + '|' + p + '">' + p +
+        '</label>';
+      }).join('');
+      return '<td>' + inner + '</td>';
+    }).join('');
+    return '<tr><td><b>' + esc(t.name) + '</b></td>' + cells + '</tr>';
+  }).join('');
+
+  el.innerHTML = '<div class="tablewrap"><table>' +
+    '<tr><th>Teacher</th>' + DAYS.map(function(d){ return '<th>' + d + '</th>'; }).join('') + '</tr>' +
+    rows + '</table></div>';
+
+  el.querySelectorAll('input[data-avail]').forEach(function(cb){
+    cb.onchange = function(){
+      var parts = cb.dataset.avail.split('|');
+      toggleAvail(parts[0], parts[1], parseInt(parts[2], 10), cb.checked);
+    };
+  });
+}
+
+/* ============================================================
+   CONSTRAINTS
+============================================================ */
+function saveConstraints() {
+  db.constraints.maxTeacherDay = Math.max(1, +document.getElementById('maxTeacherDay').value || 8);
+  db.constraints.maxClassDay = Math.max(1, +document.getElementById('maxClassDay').value || 9);
+  db.constraints.maxConsecutive = Math.max(1, +document.getElementById('maxConsecutive').value || 3);
+  db.constraints.avoidSame = document.getElementById('avoidSame').value === 'true';
+  db.constraints.distribute = document.getElementById('distribute').value === 'true';
+  db.constraints.autoRoom = document.getElementById('autoRoom').value === 'true';
+  saveData();
+  renderAll();
+}
+
+function renderConstraints() {
+  var c = db.constraints;
+  document.getElementById('maxTeacherDay').value = c.maxTeacherDay;
+  document.getElementById('maxClassDay').value = c.maxClassDay;
+  document.getElementById('maxConsecutive').value = c.maxConsecutive;
+  document.getElementById('avoidSame').value = String(c.avoidSame);
+  document.getElementById('distribute').value = String(c.distribute);
+  document.getElementById('autoRoom').value = String(c.autoRoom);
+}
+
+/* ============================================================
+   SCHEDULER
+============================================================ */
+function lessonUnits() {
+  var units = [];
+  db.requirements.forEach(function(r){
+    var n = Math.max(0, r.weeklyLessons);
+    for (var i = 0; i < n; i++) {
+      units.push({
+        id: uid('u'),
+        reqId: r.id,
+        classId: r.classId,
+        subjectId: r.subjectId,
+        teacherId: r.teacherId,
+        roomId: r.roomId || '',
+        n: i + 1
+      });
+    }
+  });
+  return units;
+}
+
+function pickRoomFor(unit, day, period, roomBusy) {
+  // If requirement has a fixed room, use it.
+  if (unit.roomId) return unit.roomId;
+  if (!db.constraints.autoRoom) return '';
+
+  // Try to find a free room. Prefer one that matches subject type heuristics.
+  var subj = db.subjects.find(function(s){ return s.id === unit.subjectId; });
+  var subjName = (subj && subj.name || '').toLowerCase();
+  var preferred = null;
+  if (/chem|bio|phys|sci/.test(subjName)) preferred = ['Laboratory'];
+  else if (/computer|it|tech/.test(subjName)) preferred = ['Computer Lab'];
+  else if (/pe|sport|gym|phys ed/.test(subjName)) preferred = ['Gymnasium','Outdoor'];
+  else if (/library|read/.test(subjName)) preferred = ['Library'];
+  else if (/art|music|drama/.test(subjName)) preferred = ['Auditorium','Other'];
+
+  var candidates = db.rooms.filter(function(r){
+    return !roomBusy.has(day + '|' + period + '|' + r.id);
+  });
+  if (!candidates.length) return '';
+
+  if (preferred) {
+    var match = candidates.find(function(r){ return preferred.indexOf(r.type) >= 0; });
+    if (match) return match.id;
+  }
+  return candidates[0].id;
+}
+
+function generateSchedule() {
+  setStatus('Generating timetable…', 'warn');
+  var log = document.getElementById('generationLog');
+  if (log) log.innerHTML = '';
+
+  if (!db.classes.length || !db.teachers.length || !db.subjects.length || !db.requirements.length) {
+    setStatus('Generation needs classes, teachers, subjects and at least one weekly requirement.', 'err');
+    showTab('generate');
+    return;
+  }
+
+  var units = lessonUnits();
+  var result = solve(units);
+
+  if (!result.ok) {
+    db.schedule = [];
+    var msg = 'No complete timetable could be found under the current hard constraints.';
+    if (log) log.innerHTML = '<div class="notice err"><b>' + esc(msg) + '</b><br>' + esc(result.reason) +
+      '<br><br>Try reducing weekly requirements, increasing capacity, removing availability blocks, or relaxing constraints.</div>';
+    setStatus(msg, 'err');
+    renderAll();
+    return;
+  }
+
+  db.schedule = result.schedule;
+  db.versions.push({ id: uid('v'), created: new Date().toISOString(), schedule: JSON.parse(JSON.stringify(db.schedule)) });
+  if (db.versions.length > 10) db.versions.shift();
+  saveData();
+
+  if (log) log.innerHTML = '<div class="notice ok">Generated ' + db.schedule.length + ' scheduled lessons with no hard conflicts.</div>';
+  setStatus('Timetable generated successfully.', 'ok');
+  renderAll();
+  showTab('timetable');
+}
+
+function solve(units) {
+  var maxNodes = 200000;
+  var nodes = 0;
+
+  var s = [];
+  var classBusy = new Set();
+  var teacherBusy = new Set();
+  var roomBusy = new Set();
+  var classDay = new Map();
+  var teacherDay = new Map();
+
+  function getDay(map, key, day) { return map.get(key + '|' + day) || 0; }
+  function setDay(map, key, day, v) { map.set(key + '|' + day, v); }
+
+  function consecutive(whoField, who, day, p) {
+    var c = 0;
+    for (var q = p - 1; q >= 0; q--) {
+      if (s.some(function(x){ return x[whoField] === who && x.day === day && x.period === q; })) c++;
+      else break;
+    }
+    for (var q2 = p + 1; q2 <= 9; q2++) {
+      if (s.some(function(x){ return x[whoField] === who && x.day === day && x.period === q2; })) c++;
+      else break;
+    }
+    return c + 1;
+  }
+
+  function candidates(u) {
+    var arr = [];
+    DAYS.forEach(function(d){
+      STRUCT[d].forEach(function(p){
+        var ck = d + '|' + p + '|' + u.classId;
+        var tk = d + '|' + p + '|' + u.teacherId;
+        if (classBusy.has(ck) || teacherBusy.has(tk)) return;
+        if (blocked(u.teacherId, d, p)) return;
+
+        var cd = getDay(classDay, u.classId, d);
+        var td = getDay(teacherDay, u.teacherId, d);
+        if (cd >= db.constraints.maxClassDay || td >= db.constraints.maxTeacherDay) return;
+
+        if (db.constraints.avoidSame && s.some(function(x){
+          return x.classId === u.classId && x.day === d && x.subjectId === u.subjectId;
+        })) return;
+
+        if (consecutive('teacherId', u.teacherId, d, p) > db.constraints.maxConsecutive) return;
+
+        // Room resolution
+        var room = '';
+        if (u.roomId) {
+          if (roomBusy.has(d + '|' + p + '|' + u.roomId)) return;
+          room = u.roomId;
+        } else if (db.constraints.autoRoom) {
+          room = pickRoomFor(u, d, p, roomBusy);
+          // If autoRoom is on but no room available, still allow the slot (roomless)
+        }
+
+        arr.push({
+          day: d,
+          period: p,
+          roomId: room,
+          score: score(u, d, p)
+        });
+      });
+    });
+    return arr.sort(function(a, b){ return a.score - b.score; });
+  }
+
+  function score(u, d, p) {
+    var sc = Math.random() * 0.01;
+    var c = getDay(classDay, u.classId, d);
+    var t = getDay(teacherDay, u.teacherId, d);
+    if (db.constraints.distribute) sc += c * 8 + t * 3;
+    if (p === 0 || p === 8) sc += 1;
+    var same = s.filter(function(x){ return x.classId === u.classId && x.subjectId === u.subjectId; }).length;
+    sc += same * 12;
+    return sc;
+  }
+
+  function place(u, c) {
+    s.push({
+      id: uid('l'),
+      day: c.day,
+      period: c.period,
+      classId: u.classId,
+      subjectId: u.subjectId,
+      teacherId: u.teacherId,
+      roomId: c.roomId || '',
+      reqId: u.reqId
+    });
+    classBusy.add(c.day + '|' + c.period + '|' + u.classId);
+    teacherBusy.add(c.day + '|' + c.period + '|' + u.teacherId);
+    if (c.roomId) roomBusy.add(c.day + '|' + c.period + '|' + c.roomId);
+    setDay(classDay, u.classId, c.day, getDay(classDay, u.classId, c.day) + 1);
+    setDay(teacherDay, u.teacherId, c.day, getDay(teacherDay, u.teacherId, c.day) + 1);
+  }
+
+  function remove(u, c) {
+    s.pop();
+    classBusy.delete(c.day + '|' + c.period + '|' + u.classId);
+    teacherBusy.delete(c.day + '|' + c.period + '|' + u.teacherId);
+    if (c.roomId) roomBusy.delete(c.day + '|' + c.period + '|' + c.roomId);
+    setDay(classDay, u.classId, c.day, getDay(classDay, u.classId, c.day) - 1);
+    setDay(teacherDay, u.teacherId, c.day, getDay(teacherDay, u.teacherId, c.day) - 1);
+  }
+
+  function recurse(left) {
+    if (!left.length) return true;
+    if (++nodes > maxNodes) return false;
+
+    // Pick unit with fewest candidates (MRV heuristic)
+    var best = null, bestC = null;
+    for (var i = 0; i < left.length; i++) {
+      var u = left[i];
+      var c = candidates(u);
+      if (!c.length) return false;
+      if (!best || c.length < bestC.length) {
+        best = u;
+        bestC = c;
+        if (c.length === 1) break;
+      }
+    }
+
+    for (var j = 0; j < bestC.length; j++) {
+      var cand = bestC[j];
+      place(best, cand);
+      var next = left.filter(function(x){ return x !== best; });
+      if (recurse(next)) return true;
+      remove(best, cand);
+    }
+    return false;
+  }
+
+  var ok = recurse(units);
+  if (ok) return { ok: true, schedule: s };
+
+  var impossible = [];
+  units.slice(0, Math.min(30, units.length)).forEach(function(u){
+    if (!candidates(u).length) {
+      impossible.push(nameOf(db.classes, u.classId) + ' / ' + nameOf(db.subjects, u.subjectId) + ' / ' + nameOf(db.teachers, u.teacherId));
+    }
+  });
+  return {
+    ok: false,
+    reason: impossible.length
+      ? 'Bottlenecks: ' + impossible.slice(0, 8).join('; ')
+      : 'Search limit reached before finding a solution.'
+  };
+}
+
+/* ============================================================
+   CLEAR / VALIDATE
+============================================================ */
+function clearSchedule() {
+  if (!confirm('Clear all generated timetable lessons?')) return;
+  db.schedule = [];
+  saveData();
+  renderAll();
+  setStatus('Schedule cleared.', 'warn');
+}
+
+function validateAll() {
+  var errors = [];
+  var seenC = new Set(), seenT = new Set(), seenR = new Set();
+
+  db.schedule.forEach(function(x){
+    var ck = slotKey(x.day, x.period) + '|' + x.classId;
+    var tk = slotKey(x.day, x.period) + '|' + x.teacherId;
+    if (seenC.has(ck)) errors.push('Class double booking: ' + nameOf(db.classes, x.classId) + ' ' + x.day + ' P' + x.period);
+    if (seenT.has(tk)) errors.push('Teacher double booking: ' + nameOf(db.teachers, x.teacherId) + ' ' + x.day + ' P' + x.period);
+    seenC.add(ck); seenT.add(tk);
+
+    if (x.roomId) {
+      var rk = slotKey(x.day, x.period) + '|' + x.roomId;
+      if (seenR.has(rk)) errors.push('Room double booking: ' + nameOf(db.rooms, x.roomId) + ' ' + x.day + ' P' + x.period);
+      seenR.add(rk);
+      if (!db.rooms.some(function(r){ return r.id === x.roomId; })) {
+        errors.push('Unknown room reference: ' + x.roomId + ' on ' + x.day + ' P' + x.period);
+      }
+    }
+
+    if (!STRUCT[x.day] || STRUCT[x.day].indexOf(+x.period) < 0) {
+      errors.push('Invalid period ' + x.period + ' on ' + x.day);
+    }
+    if (blocked(x.teacherId, x.day, +x.period)) {
+      errors.push('Teacher unavailable: ' + nameOf(db.teachers, x.teacherId) + ' ' + x.day + ' P' + x.period);
+    }
+  });
+
+  var reqCounts = {};
+  db.schedule.forEach(function(x){ reqCounts[x.reqId] = (reqCounts[x.reqId] || 0) + 1; });
+  db.requirements.forEach(function(r){
+    if ((reqCounts[r.id] || 0) !== r.weeklyLessons) {
+      errors.push('Requirement not met: ' + nameOf(db.classes, r.classId) + ' / ' + nameOf(db.subjects, r.subjectId) +
+        ' needs ' + r.weeklyLessons + ', scheduled ' + (reqCounts[r.id] || 0));
+    }
+  });
+
+  var msg = errors.length
+    ? '<div class="notice err"><b>' + errors.length + ' issue(s)</b></div>' + errors.slice(0, 100).map(function(e){ return '<div class="conflict">' + esc(e) + '</div>'; }).join('')
+    : '<div class="notice ok"><b>No hard conflicts detected.</b><br>All scheduled lessons use valid periods and meet recorded requirements.</div>';
+
+  document.getElementById('conflictReport').innerHTML = msg;
+  document.getElementById('dashValidation').innerHTML = msg;
+  showTab('conflicts');
+  return errors;
+}
+
+/* ============================================================
+   TIMETABLES
+============================================================ */
+function renderSelects() {
+  var c = document.getElementById('ttClass');
+  var t = document.getElementById('ttTeacher');
+  if (c) c.innerHTML = opt(db.classes, c.value, 'Select class');
+  if (t) t.innerHTML = opt(db.teachers, t.value, 'Select teacher');
+}
+
+function renderTimetable() {
+  var cc = document.getElementById('ttClass').value;
+  var tt = document.getElementById('ttTeacher').value;
+  document.getElementById('classTimetable').innerHTML = cc ? makeTT('classId', cc) : '';
+  document.getElementById('teacherTimetable').innerHTML = tt ? makeTT('teacherId', tt) : '';
+}
+
+function makeTT(field, id) {
+  var html = '<div class="tablewrap"><table class="tt">' +
+    '<tr><th class="period">Period</th>' +
+    DAYS.map(function(d){ return '<th>' + d + '</th>'; }).join('') +
+    '</tr>';
+
+  for (var display = 0; display < 9; display++) {
+    var cells = '';
+    for (var di = 0; di < DAYS.length; di++) {
+      var d = DAYS[di];
+      var periods = STRUCT[d];
+      if (periods.indexOf(display) < 0) { cells += '<td class="break">—</td>'; continue; }
+      if (display === BREAK_AFTER[d] + 1) { cells += '<td class="break">BREAK</td>'; continue; }
+
+      var x = db.schedule.find(function(a){
+        return a[field] === id && a.day === d && a.period === display;
+      });
+
+      if (x) {
+        var other = field === 'classId'
+          ? nameOf(db.teachers, x.teacherId)
+          : nameOf(db.classes, x.classId);
+        var roomLabel = x.roomId ? ' • ' + esc(nameOf(db.rooms, x.roomId)) : '';
+        cells += '<td><div class="lesson"><b>' + esc(nameOf(db.subjects, x.subjectId)) + '</b>' +
+          '<small>' + esc(other) + roomLabel + '</small></div></td>';
+      } else {
+        cells += '<td></td>';
+      }
+    }
+    html += '<tr><th class="period">P' + display + '</th>' + cells + '</tr>';
+  }
+  html += '</table></div>';
+  return html;
+}
+
+/* ============================================================
+   WORKLOAD
+============================================================ */
+function renderWorkload() {
+  var rows = db.teachers.map(function(t){
+    var ss = db.schedule.filter(function(x){ return x.teacherId === t.id; });
+    var days = new Set(ss.map(function(x){ return x.day; }));
+    var maxCon = 0;
+    DAYS.forEach(function(d){
+      var ps = ss.filter(function(x){ return x.day === d; }).map(function(x){ return x.period; }).sort(function(a, b){ return a - b; });
+      var run = 0, prev = null;
+      ps.forEach(function(p){
+        run = (prev !== null && p === prev + 1) ? run + 1 : 1;
+        if (run > maxCon) maxCon = run;
+        prev = p;
+      });
+    });
+    var avg = days.size ? (ss.length / days.size).toFixed(1) : '0';
+    var dayCounts = DAYS.map(function(d){ return ss.filter(function(x){ return x.day === d; }).length; }).join(' / ');
+    return '<tr><td>' + esc(t.name) + '</td><td>' + ss.length + '</td><td>' + avg + '</td><td>' + maxCon + '</td><td>' + dayCounts + '</td></tr>';
+  }).join('');
+
+  document.getElementById('workloadTable').innerHTML =
+    '<div class="tablewrap"><table>' +
+    '<tr><th>Teacher</th><th>Weekly</th><th>Avg/day</th><th>Max consecutive</th><th>Mon / Tue / Wed / Thu / Fri</th></tr>' +
+    (rows || '<tr><td colspan="5" class="empty">No teachers.</td></tr>') +
+    '</table></div>';
+}
+
+/* ============================================================
+   REPORTS
+============================================================ */
+function renderReports() {
+  var cov = db.subjects.map(function(s){
+    var req = db.requirements.filter(function(r){ return r.subjectId === s.id; }).reduce(function(a, r){
