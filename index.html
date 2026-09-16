@@ -4,27 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#315efb">
-<meta name="description" content="Constraint-based school timetable generator — runs entirely in your browser, no backend needed.">
-<meta property="og:title" content="Smart School Timetable Generator">
-<meta property="og:description" content="Generate, validate and print class & teacher timetables. Works offline.">
-<meta property="og:type" content="website">
+<meta name="description" content="Constraint-based school timetable generator — runs entirely in your browser.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📅</text></svg>">
 <title>Smart School Timetable Generator</title>
 <style>
 :root{--bg:#f5f7fb;--card:#fff;--ink:#172033;--muted:#667085;--line:#e4e7ec;--brand:#315efb;--brand2:#1d4ed8;--danger:#d92d20;--warn:#b54708;--ok:#027a48;--shadow:0 8px 25px rgba(16,24,40,.07)}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink);-webkit-text-size-adjust:100%}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink);-webkit-text-size-adjust:100%}
 header{background:linear-gradient(135deg,#172b75,#315efb);color:#fff;padding:16px 20px;position:sticky;top:0;z-index:20;box-shadow:0 4px 18px #0002}
 .head{max-width:1500px;margin:auto;display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}
 .head h1{margin:0;font-size:20px}.head p{margin:4px 0 0;opacity:.85;font-size:12px}
 .container{max-width:1500px;margin:auto;padding:18px}
 .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
-.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;padding:9px 13px;cursor:pointer;font-weight:600;font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;padding:9px 13px;cursor:pointer;font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:5px}
 .btn:hover{border-color:#98a2b3;background:#fafbfc}
 .btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.primary:hover{background:var(--brand2)}
 .btn.success{background:#ecfdf3;color:var(--ok);border-color:#abefc6}
 .btn.danger{background:#fff1f0;color:var(--danger);border-color:#fecdca}
 .btn.small{padding:6px 9px;font-size:12px}
-.tabs{display:flex;gap:4px;overflow:auto;border-bottom:1px solid var(--line);margin-bottom:18px;scrollbar-width:thin}
+.tabs{display:flex;gap:4px;overflow:auto;border-bottom:1px solid var(--line);margin-bottom:18px}
 .tab{padding:10px 13px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-weight:700;white-space:nowrap;border-bottom:3px solid transparent;font-size:13px}
 .tab.active{color:var(--brand);border-color:var(--brand)}
 .panel{display:none}.panel.active{display:block}
@@ -46,7 +44,6 @@ th,td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-a
 th{background:#f8fafc;position:sticky;top:0;z-index:1}
 .tablewrap{overflow:auto;max-height:65vh}
 .pill{display:inline-block;padding:3px 7px;border-radius:999px;background:#eef2ff;color:#3446a3;font-size:11px;font-weight:700;margin:2px}
-.pill.red{background:#fee4e2;color:#b42318}.pill.green{background:#dcfae6;color:#067647}.pill.yellow{background:#fef0c7;color:#93370d}
 .notice{padding:11px 13px;border-radius:9px;margin:10px 0;background:#f2f4f7;font-size:13px}
 .notice.ok{background:#ecfdf3;color:#067647}.notice.err{background:#fef3f2;color:#b42318}.notice.warn{background:#fffaeb;color:#93370d}
 .hidden{display:none!important}.right{float:right}
@@ -59,17 +56,9 @@ th{background:#f8fafc;position:sticky;top:0;z-index:1}
 .break{background:#f2f4f7!important;text-align:center;font-weight:800;color:#667085}
 .conflict{border-left:4px solid var(--danger);background:#fff5f5;padding:9px;margin:6px 0;border-radius:5px;font-size:13px}
 .empty{color:#98a2b3;text-align:center;padding:18px}
-.tag{font-size:10px;padding:2px 5px;border-radius:4px;background:#f2f4f7}
 .footer{color:#98a2b3;text-align:center;padding:25px;font-size:12px}
-.autosave{font-size:11px;color:#98a2b3;margin-left:auto}
-@media print{
-  header,.toolbar,.tabs,.footer,.actions,.btn,.autosave{display:none!important}
-  .panel{display:block!important}
-  .panel:not(#timetable){display:none!important}
-  body{background:#fff}
-  .card{box-shadow:none;border:0;padding:0}
-  .tt{min-width:auto;font-size:11px}
-}
+.autosave{font-size:11px;color:#98a2b3;margin-left:auto;align-self:center}
+@media print{header,.toolbar,.tabs,.footer,.actions,.btn,.autosave{display:none!important}.panel{display:block!important}.panel:not(#timetable){display:none!important}body{background:#fff}.card{box-shadow:none;border:0;padding:0}}
 </style>
 </head>
 <body>
@@ -77,7 +66,7 @@ th{background:#f8fafc;position:sticky;top:0;z-index:1}
   <div class="head">
     <div>
       <h1>📅 Smart School Timetable Generator</h1>
-      <p id="schoolTitle">Constraint-based weekly timetable management — GitHub Pages ready</p>
+      <p id="schoolTitle">Constraint-based weekly timetable management</p>
     </div>
     <div class="actions">
       <button class="btn" id="btnExport">⬇ Export JSON</button>
@@ -122,7 +111,7 @@ th{background:#f8fafc;position:sticky;top:0;z-index:1}
       <div class="card span6">
         <h3>Timetable Structure</h3>
         <div id="structureTable"></div>
-        <div class="notice">Monday–Thursday: Periods 0–4, Break, 5–8. Friday: Periods 1–5, Break, 6. Breaks are not schedulable.</div>
+        <div class="notice">Mon–Thu: Periods 0–4, Break, 5–8. Friday: Periods 1–5, Break, 6.</div>
       </div>
     </div>
   </section>
@@ -137,7 +126,7 @@ th{background:#f8fafc;position:sticky;top:0;z-index:1}
   <section class="panel" id="classTeachers">
     <div class="card">
       <h3>Class Teacher Management</h3>
-      <div class="notice">Class Teacher is an independent relationship. Changing a Class Teacher never changes the subject timetable.</div>
+      <div class="notice">Class Teacher is independent — changing it does not change the subject timetable.</div>
       <div id="classTeacherTable"></div>
     </div>
   </section>
@@ -158,8 +147,8 @@ th{background:#f8fafc;position:sticky;top:0;z-index:1}
 
   <section class="panel" id="assignments">
     <div class="card">
-      <h3>Teaching Assignments / Weekly Requirements <button class="btn small primary right" id="btnAddReq">+ Add Requirement</button></h3>
-      <div class="notice">Each row means: this teacher teaches this subject to this class for this many lessons per week.</div>
+      <h3>Teaching Assignments <button class="btn small primary right" id="btnAddReq">+ Add Requirement</button></h3>
+      <div class="notice">Each row: teacher X teaches subject Y to class Z for N lessons per week.</div>
       <div id="assignmentTable"></div>
     </div>
   </section>
@@ -173,8 +162,8 @@ th{background:#f8fafc;position:sticky;top:0;z-index:1}
 
   <section class="panel" id="availability">
     <div class="card">
-      <h3>Teacher Availability / Unavailability</h3>
-      <div class="notice">Tick a day-period as blocked for a teacher. The solver will never place that teacher there.</div>
+      <h3>Teacher Availability</h3>
+      <div class="notice">Tick a day-period as blocked for a teacher. The solver will never place them there.</div>
       <div id="availabilityTable"></div>
     </div>
   </section>
@@ -196,7 +185,7 @@ th{background:#f8fafc;position:sticky;top:0;z-index:1}
   <section class="panel" id="generate">
     <div class="card">
       <h3>Generation</h3>
-      <p class="muted">The generator expands every weekly requirement into individual lesson units, schedules the hardest units first, checks teacher/class/room conflicts and availability, and backtracks when necessary.</p>
+      <p class="muted">The generator expands weekly requirements into lesson units, schedules the hardest first, checks conflicts, and backtracks.</p>
       <button class="btn primary" id="btnGenerate2">⚡ Generate / Regenerate</button>
       <div id="generationLog"></div>
     </div>
@@ -204,12 +193,12 @@ th{background:#f8fafc;position:sticky;top:0;z-index:1}
 
   <section class="panel" id="timetable">
     <div class="card">
-      <h3>Class Timetables <button class="btn small right" onclick="window.print()">🖨 Print</button></h3>
+      <h3>Class Timetables</h3>
       <div class="formgrid"><div><label>Select Class</label><select id="ttClass"></select></div></div>
       <div id="classTimetable"></div>
     </div>
     <div class="card" style="margin-top:14px">
-      <h3>Teacher Timetables <button class="btn small right" onclick="window.print()">🖨 Print</button></h3>
+      <h3>Teacher Timetables</h3>
       <div class="formgrid"><div><label>Select Teacher</label><select id="ttTeacher"></select></div></div>
       <div id="teacherTimetable"></div>
     </div>
@@ -235,7 +224,7 @@ th{background:#f8fafc;position:sticky;top:0;z-index:1}
       <div class="card span6">
         <h3>Data Export</h3>
         <button class="btn primary" id="btnExport2">Download Master JSON</button>
-        <p class="muted">The JSON contains setup, structure, classes, class teachers, teachers, subjects, rooms, requirements, availability, constraints and schedule.</p>
+        <p class="muted">JSON contains setup, classes, teachers, subjects, requirements, constraints and schedule.</p>
       </div>
       <div class="card span6">
         <h3>Reset</h3>
@@ -247,13 +236,13 @@ th{background:#f8fafc;position:sticky;top:0;z-index:1}
   <section class="panel" id="settings">
     <div class="card">
       <h3>Settings</h3>
-      <p>Data is stored locally in this browser using localStorage. No server or backend is required, so the application can run on GitHub Pages.</p>
-      <p class="muted">Recommended workflow: Setup → Classes → Teachers → Subjects → Assignments → Availability/Rooms → Constraints → Generate → Validate → Timetable/Reports.</p>
-      <p class="muted">Keyboard shortcuts: <span class="mono">Ctrl+S</span> save · <span class="mono">Ctrl+P</span> print · <span class="mono">Ctrl+Enter</span> generate</p>
+      <p>Data is stored in your browser using localStorage. No backend needed — works on GitHub Pages.</p>
+      <p class="muted">Workflow: Setup → Classes → Teachers → Subjects → Assignments → Availability/Rooms → Constraints → Generate → Validate.</p>
+      <p class="muted">Shortcuts: Ctrl+S save · Ctrl+P print · Ctrl+Enter generate</p>
     </div>
   </section>
 
-  <div class="footer">Smart School Timetable Generator • Single-file static application • Runs entirely in your browser</div>
+  <div class="footer">Smart School Timetable Generator • Single-file static application</div>
 </div>
 
 <script>
@@ -265,48 +254,56 @@ const BREAK_AFTER={Monday:4,Tuesday:4,Wednesday:4,Thursday:4,Friday:5};
 let db=loadDB();
 const tabs=[['dashboard','Dashboard'],['setup','School Setup'],['classes','Classes'],['classTeachers','Class Teachers'],['teachers','Teachers'],['subjects','Subjects'],['assignments','Teaching Assignments'],['rooms','Rooms'],['availability','Availability'],['constraints','Constraints'],['generate','Generate'],['timetable','Timetable'],['conflicts','Conflicts'],['workload','Workload'],['reports','Reports'],['io','Import / Export'],['settings','Settings']];
 
-function blankDB(){return {school:{name:'The Trust School',campus:'',session:''},days:[...DAYS],timetableStructure:STRUCT,classes:[],classTeachers:[],teachers:[],subjects:[],rooms:[],requirements:[],availability:[],constraints:{maxTeacherDay:8,maxClassDay:9,maxConsecutive:3,avoidSame:true,distribute:true},schedule:[],versions:[]}}
+function blankDB(){return{school:{name:'The Trust School',campus:'',session:''},days:[...DAYS],timetableStructure:STRUCT,classes:[],classTeachers:[],teachers:[],subjects:[],rooms:[],requirements:[],availability:[],constraints:{maxTeacherDay:8,maxClassDay:9,maxConsecutive:3,avoidSame:true,distribute:true},schedule:[],versions:[]}}
 function loadDB(){try{const x=JSON.parse(localStorage.getItem(KEY));return x?migrate(x):blankDB()}catch(e){return blankDB()}}
 function migrate(x){const b=blankDB();return Object.assign(b,x,{school:Object.assign(b.school,x.school||{}),constraints:Object.assign(b.constraints,x.constraints||{}),schedule:x.schedule||[],requirements:x.requirements||x.assignments||[]})}
 function uid(p){return p+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7)}
-function esc(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
-function saveData(){localStorage.setItem(KEY,JSON.stringify(db));setStatus('Saved locally.','ok');const n=document.getElementById('autosaveNote');if(n){n.textContent='Saved '+new Date().toLocaleTimeString()}}
-function setStatus(msg,type=''){document.getElementById('status').innerHTML=msg?`<div class="notice ${type}">${esc(msg)}</div>`:''}
-function renderTabs(){document.getElementById('tabs').innerHTML=tabs.map((t,i)=>`<button class="tab ${i===0?'active':''}" data-panel="${t[0]}">${t[1]}</button>`).join('');document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>showTab(b.dataset.panel,b))}
-function showTab(id,btn){document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));const el=document.getElementById(id);if(el)el.classList.add('active');document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));(btn||[...document.querySelectorAll('.tab')].find(x=>x.dataset.panel===id))?.classList.add('active');renderAll()}
-function opt(list,val,placeholder='Select…',labelKey='name'){return `<option value="">${placeholder}</option>`+list.map(x=>`<option value="${esc(x.id)}" ${x.id===val?'selected':''}>${esc(x[labelKey])}</option>`).join('')}
-function nameOf(list,id){return list.find(x=>x.id===id)?.name||'—'}
+function esc(s){return String(s==null?'':s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function saveData(){localStorage.setItem(KEY,JSON.stringify(db));setStatus('Saved locally.','ok');const n=document.getElementById('autosaveNote');if(n)n.textContent='Saved '+new Date().toLocaleTimeString()}
+function setStatus(msg,type){type=type||'';document.getElementById('status').innerHTML=msg?'<div class="notice '+type+'">'+esc(msg)+'</div>':''}
+function nameOf(list,id){const x=list.find(function(y){return y.id===id});return x?x.name:'—'}
 function slotKey(d,p){return d+'|'+p}
+function opt(list,val,placeholder,labelKey){placeholder=placeholder||'Select…';labelKey=labelKey||'name';return '<option value="">'+placeholder+'</option>'+list.map(function(x){return '<option value="'+esc(x.id)+'"'+(x.id===val?' selected':'')+'>'+esc(x[labelKey])+'</option>'}).join('')}
+
+function renderTabs(){document.getElementById('tabs').innerHTML=tabs.map(function(t,i){return '<button class="tab'+(i===0?' active':'')+'" data-panel="'+t[0]+'">'+t[1]+'</button>'}).join('');document.querySelectorAll('.tab').forEach(function(b){b.onclick=function(){showTab(b.dataset.panel,b)}})}
+function showTab(id,btn){document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('active')});const el=document.getElementById(id);if(el)el.classList.add('active');document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});const b=btn||[].slice.call(document.querySelectorAll('.tab')).find(function(x){return x.dataset.panel===id});if(b)b.classList.add('active');renderAll()}
 
 function saveSetup(){db.school.name=document.getElementById('schoolName').value.trim();db.school.campus=document.getElementById('campus').value.trim();db.school.session=document.getElementById('session').value.trim();saveData();renderAll()}
-function renderSetup(){document.getElementById('schoolName').value=db.school.name||'';document.getElementById('campus').value=db.school.campus||'';document.getElementById('session').value=db.school.session||'';document.getElementById('schoolTitle').textContent=[db.school.name,db.school.campus,db.school.session].filter(Boolean).join(' • ')||'Constraint-based weekly timetable management — GitHub Pages ready';document.getElementById('structureTable').innerHTML='<table><tr><th>Day</th><th>Teaching periods</th><th>Break</th></tr>'+DAYS.map(d=>`<tr><td>${d}</td><td>${STRUCT[d].join(', ')}</td><td>After ${BREAK_AFTER[d]}</td></tr>`).join('')+'</table>'}
+function renderSetup(){document.getElementById('schoolName').value=db.school.name||'';document.getElementById('campus').value=db.school.campus||'';document.getElementById('session').value=db.school.session||'';document.getElementById('schoolTitle').textContent=[db.school.name,db.school.campus,db.school.session].filter(Boolean).join(' • ')||'Constraint-based weekly timetable management';document.getElementById('structureTable').innerHTML='<table><tr><th>Day</th><th>Teaching periods</th><th>Break</th></tr>'+DAYS.map(function(d){return '<tr><td>'+d+'</td><td>'+STRUCT[d].join(', ')+'</td><td>After '+BREAK_AFTER[d]+'</td></tr>'}).join('')+'</table>'}
 
-function addClass(){const name=prompt('Class name, e.g. 6A');if(!name)return;db.classes.push({id:uid('c'),name:name.trim(),grade:name.trim().match(/^\d+/)?.[0]||'',section:'',roomId:''});saveData();renderAll()}
-function editClass(id){const c=db.classes.find(x=>x.id===id);if(!c)return;const n=prompt('Class name',c.name);if(n&&n.trim()){c.name=n.trim();saveData();renderAll()}}
-function delClass(id){if(confirm('Delete this class and its requirements/schedule?')){db.classes=db.classes.filter(x=>x.id!==id);db.requirements=db.requirements.filter(x=>x.classId!==id);db.classTeachers=db.classTeachers.filter(x=>x.classId!==id);db.schedule=db.schedule.filter(x=>x.classId!==id);saveData();renderAll()}}
-function renderClasses(){document.getElementById('classTable').innerHTML=db.classes.length?`<div class="tablewrap"><table><tr><th>Class</th><th>Grade</th><th>Section</th><th>Class Teacher</th><th>Actions</th></tr>${db.classes.map(c=>{let ct=db.classTeachers.find(x=>x.classId===c.id);let t=db.teachers.find(x=>x.id===ct?.teacherId);return `<tr><td><b>${esc(c.name)}</b></td><td>${esc(c.grade)}</td><td>${esc(c.section)}</td><td>${esc(t?.name||'Not assigned')}</td><td><div class="actions"><button class="btn small" onclick="editClass('${c.id}')">Edit</button><button class="btn small danger" onclick="delClass('${c.id}')">Delete</button></div></td></tr>`}).join('')}</table></div>`:'<div class="empty">No classes yet. Click “Add Class” to begin.</div>'}
+function addClass(){const name=prompt('Class name, e.g. 6A');if(!name)return;db.classes.push({id:uid('c'),name:name.trim(),grade:(name.trim().match(/^\d+/)||[''])[0],section:'',roomId:''});saveData();renderAll()}
+function editClass(id){const c=db.classes.find(function(x){return x.id===id});if(!c)return;const n=prompt('Class name',c.name);if(n&&n.trim()){c.name=n.trim();saveData();renderAll()}}
+function delClass(id){if(confirm('Delete this class and its requirements/schedule?')){db.classes=db.classes.filter(function(x){return x.id!==id});db.requirements=db.requirements.filter(function(x){return x.classId!==id});db.classTeachers=db.classTeachers.filter(function(x){return x.classId!==id});db.schedule=db.schedule.filter(function(x){return x.classId!==id});saveData();renderAll()}}
+function renderClasses(){document.getElementById('classTable').innerHTML=db.classes.length?'<div class="tablewrap"><table><tr><th>Class</th><th>Grade</th><th>Section</th><th>Class Teacher</th><th>Actions</th></tr>'+db.classes.map(function(c){const ct=db.classTeachers.find(function(x){return x.classId===c.id});const t=db.teachers.find(function(x){return x.id===(ct&&ct.teacherId)});return '<tr><td><b>'+esc(c.name)+'</b></td><td>'+esc(c.grade)+'</td><td>'+esc(c.section)+'</td><td>'+esc(t?t.name:'Not assigned')+'</td><td><div class="actions"><button class="btn small" onclick="editClass(\''+c.id+'\')">Edit</button><button class="btn small danger" onclick="delClass(\''+c.id+'\')">Delete</button></div></td></tr>'}).join('')+'</table></div>':'<div class="empty">No classes yet. Click “Add Class” to begin.</div>'}
 
-function renderClassTeachers(){document.getElementById('classTeacherTable').innerHTML=db.classes.length?`<div class="tablewrap"><table><tr><th>Class</th><th>Class Teacher</th></tr>${db.classes.map(c=>{let ct=db.classTeachers.find(x=>x.classId===c.id);return `<tr><td><b>${esc(c.name)}</b></td><td><select onchange="setClassTeacher('${c.id}',this.value)">${opt(db.teachers,ct?.teacherId,'No class teacher')}</select></td></tr>`}).join('')}</table></div>`:'<div class="empty">Add classes first.</div>'}
-function setClassTeacher(classId,teacherId){db.classTeachers=db.classTeachers.filter(x=>x.classId!==classId);if(teacherId)db.classTeachers.push({id:uid('ct'),classId,teacherId});saveData();renderAll()}
+function renderClassTeachers(){document.getElementById('classTeacherTable').innerHTML=db.classes.length?'<div class="tablewrap"><table><tr><th>Class</th><th>Class Teacher</th></tr>'+db.classes.map(function(c){const ct=db.classTeachers.find(function(x){return x.classId===c.id});return '<tr><td><b>'+esc(c.name)+'</b></td><td><select onchange="setClassTeacher(\''+c.id+'\',this.value)">'+opt(db.teachers,ct&&ct.teacherId,'No class teacher')+'</select></td></tr>'}).join('')+'</table></div>':'<div class="empty">Add classes first.</div>'}
+function setClassTeacher(classId,teacherId){db.classTeachers=db.classTeachers.filter(function(x){return x.classId!==classId});if(teacherId)db.classTeachers.push({id:uid('ct'),classId:classId,teacherId:teacherId});saveData();renderAll()}
 
 function addTeacher(){const name=prompt('Teacher name');if(!name)return;db.teachers.push({id:uid('t'),name:name.trim(),code:'',subjects:[]});saveData();renderAll()}
-function editTeacher(id){const t=db.teachers.find(x=>x.id===id);const n=prompt('Teacher name',t.name);if(n&&n.trim()){t.name=n.trim();saveData();renderAll()}}
-function delTeacher(id){if(confirm('Delete teacher and related requirements?')){db.teachers=db.teachers.filter(x=>x.id!==id);db.requirements=db.requirements.filter(x=>x.teacherId!==id);db.classTeachers=db.classTeachers.filter(x=>x.teacherId!==id);db.schedule=db.schedule.filter(x=>x.teacherId!==id);saveData();renderAll()}}
-function renderTeachers(){document.getElementById('teacherTable').innerHTML=db.teachers.length?`<div class="tablewrap"><table><tr><th>Teacher</th><th>Subjects they can teach</th><th>Actions</th></tr>${db.teachers.map(t=>`<tr><td><b>${esc(t.name)}</b></td><td><select multiple size="3" onchange="setTeacherSubjects('${t.id}',this)">${db.subjects.map(s=>`<option value="${s.id}" ${t.subjects?.includes(s.id)?'selected':''}>${esc(s.name)}</option>`).join('')}</select></td><td><button class="btn small" onclick="editTeacher('${t.id}')">Edit</button> <button class="btn small danger" onclick="delTeacher('${t.id}')">Delete</button></td></tr>`).join('')}</table></div>`:'<div class="empty">Add teachers to begin.</div>'}
-function setTeacherSubjects(id,el){const t=db.teachers.find(x=>x.id===id);t.subjects=[...el.selectedOptions].map(x=>x.value);saveData()}
+function editTeacher(id){const t=db.teachers.find(function(x){return x.id===id});const n=prompt('Teacher name',t.name);if(n&&n.trim()){t.name=n.trim();saveData();renderAll()}}
+function delTeacher(id){if(confirm('Delete teacher and related requirements?')){db.teachers=db.teachers.filter(function(x){return x.id!==id});db.requirements=db.requirements.filter(function(x){return x.teacherId!==id});db.classTeachers=db.classTeachers.filter(function(x){return x.teacherId!==id});db.schedule=db.schedule.filter(function(x){return x.teacherId!==id});saveData();renderAll()}}
+function renderTeachers(){document.getElementById('teacherTable').innerHTML=db.teachers.length?'<div class="tablewrap"><table><tr><th>Teacher</th><th>Subjects they can teach</th><th>Actions</th></tr>'+db.teachers.map(function(t){return '<tr><td><b>'+esc(t.name)+'</b></td><td><select multiple size="3" onchange="setTeacherSubjects(\''+t.id+'\',this)">'+db.subjects.map(function(s){return '<option value="'+s.id+'"'+((t.subjects||[]).indexOf(s.id)>=0?' selected':'')+'>'+esc(s.name)+'</option>'}).join('')+'</select></td><td><button class="btn small" onclick="editTeacher(\''+t.id+'\')">Edit</button> <button class="btn small danger" onclick="delTeacher(\''+t.id+'\')">Delete</button></td></tr>'}).join('')+'</table></div>':'<div class="empty">Add teachers to begin.</div>'}
+function setTeacherSubjects(id,el){const t=db.teachers.find(function(x){return x.id===id});t.subjects=[].slice.call(el.selectedOptions).map(function(x){return x.value});saveData()}
 
 function addSubject(){const name=prompt('Subject name');if(!name)return;db.subjects.push({id:uid('s'),name:name.trim(),code:'',doublePeriod:false});saveData();renderAll()}
-function editSubject(id){const s=db.subjects.find(x=>x.id===id);const n=prompt('Subject name',s.name);if(n&&n.trim()){s.name=n.trim();saveData();renderAll()}}
-function delSubject(id){if(confirm('Delete subject and its requirements/schedule?')){db.subjects=db.subjects.filter(x=>x.id!==id);db.requirements=db.requirements.filter(x=>x.subjectId!==id);db.schedule=db.schedule.filter(x=>x.subjectId!==id);db.teachers.forEach(t=>t.subjects=(t.subjects||[]).filter(x=>x!==id));saveData();renderAll()}}
-function renderSubjects(){document.getElementById('subjectTable').innerHTML=db.subjects.length?`<table><tr><th>Subject</th><th>Code</th><th>Double Period</th><th>Actions</th></tr>${db.subjects.map(s=>`<tr><td>${esc(s.name)}</td><td>${esc(s.code||'')}</td><td><input type="checkbox" ${s.doublePeriod?'checked':''} onchange="toggleDouble('${s.id}',this.checked)"></td><td><button class="btn small" onclick="editSubject('${s.id}')">Edit</button> <button class="btn small danger" onclick="delSubject('${s.id}')">Delete</button></td></tr>`).join('')}</table>`:'<div class="empty">Add subjects first.</div>'}
-function toggleDouble(id,v){db.subjects.find(x=>x.id===id).doublePeriod=v;saveData()}
+function editSubject(id){const s=db.subjects.find(function(x){return x.id===id});const n=prompt('Subject name',s.name);if(n&&n.trim()){s.name=n.trim();saveData();renderAll()}}
+function delSubject(id){if(confirm('Delete subject and its requirements/schedule?')){db.subjects=db.subjects.filter(function(x){return x.id!==id});db.requirements=db.requirements.filter(function(x){return x.subjectId!==id});db.schedule=db.schedule.filter(function(x){return x.subjectId!==id});db.teachers.forEach(function(t){t.subjects=(t.subjects||[]).filter(function(x){return x!==id})});saveData();renderAll()}}
+function renderSubjects(){document.getElementById('subjectTable').innerHTML=db.subjects.length?'<table><tr><th>Subject</th><th>Code</th><th>Double</th><th>Actions</th></tr>'+db.subjects.map(function(s){return '<tr><td>'+esc(s.name)+'</td><td>'+esc(s.code||'')+'</td><td><input type="checkbox"'+(s.doublePeriod?' checked':'')+' onchange="toggleDouble(\''+s.id+'\',this.checked)"></td><td><button class="btn small" onclick="editSubject(\''+s.id+'\')">Edit</button> <button class="btn small danger" onclick="delSubject(\''+s.id+'\')">Delete</button></td></tr>'}).join('')+'</table>':'<div class="empty">Add subjects first.</div>'}
+function toggleDouble(id,v){db.subjects.find(function(x){return x.id===id}).doublePeriod=v;saveData()}
 
-function addRequirement(){if(!db.classes.length||!db.subjects.length||!db.teachers.length){alert('Add classes, subjects and teachers first.');return}const c=prompt('Class name:\n'+db.classes.map(x=>x.name).join(', '));const cl=db.classes.find(x=>x.name.toLowerCase()===c?.trim().toLowerCase());if(!cl)return alert('Class not found.');const sname=prompt('Subject:\n'+db.subjects.map(x=>x.name).join(', '));const s=db.subjects.find(x=>x.name.toLowerCase()===sname?.trim().toLowerCase());if(!s)return alert('Subject not found.');const tname=prompt('Teacher:\n'+db.teachers.map(x=>x.name).join(', '));const t=db.teachers.find(x=>x.name.toLowerCase()===tname?.trim().toLowerCase());if(!t)return alert('Teacher not found.');const n=Number(prompt('Lessons per week','5'));if(!Number.isFinite(n)||n<1)return;db.requirements.push({id:uid('r'),classId:cl.id,subjectId:s.id,teacherId:t.id,weeklyLessons:Math.floor(n),roomId:''});saveData();renderAll()}
-function renderAssignments(){document.getElementById('assignmentTable').innerHTML=db.requirements.length?`<div class="tablewrap"><table><tr><th>Class</th><th>Subject</th><th>Teacher</th><th>Weekly Lessons</th><th>Room</th><th>Actions</th></tr>${db.requirements.map(r=>`<tr><td>${esc(nameOf(db.classes,r.classId))}</td><td>${esc(nameOf(db.subjects,r.subjectId))}</td><td>${esc(nameOf(db.teachers,r.teacherId))}</td><td><input type="number" min="1" value="${r.weeklyLessons}" style="width:80px" onchange="changeReq('${r.id}',this.value)"></td><td><select onchange="changeReqRoom('${r.id}',this.value)">${opt(db.rooms,r.roomId,'Any room')}</select></td><td><button class="btn small danger" onclick="delReq('${r.id}')">Delete</button></td></tr>`).join('')}</table></div>`:'<div class="empty">No weekly teaching requirements.</div>'}
-function changeReq(id,v){const r=db.requirements.find(x=>x.id===id);r.weeklyLessons=Math.max(1,parseInt(v)||1);saveData()}
-function changeReqRoom(id,v){db.requirements.find(x=>x.id===id).roomId=v;saveData()}
-function delReq(id){db.requirements=db.requirements.filter(x=>x.id!==id);db.schedule=[];saveData();renderAll()}
+function addRequirement(){if(!db.classes.length||!db.subjects.length||!db.teachers.length){alert('Add classes, subjects and teachers first.');return}
+ const c=prompt('Class name:\n'+db.classes.map(function(x){return x.name}).join(', '));const cl=db.classes.find(function(x){return x.name.toLowerCase()===(c||'').trim().toLowerCase()});if(!cl)return alert('Class not found.');
+ const sn=prompt('Subject:\n'+db.subjects.map(function(x){return x.name}).join(', '));const s=db.subjects.find(function(x){return x.name.toLowerCase()===(sn||'').trim().toLowerCase()});if(!s)return alert('Subject not found.');
+ const tn=prompt('Teacher:\n'+db.teachers.map(function(x){return x.name}).join(', '));const t=db.teachers.find(function(x){return x.name.toLowerCase()===(tn||'').trim().toLowerCase()});if(!t)return alert('Teacher not found.');
+ const n=Number(prompt('Lessons per week','5'));if(!isFinite(n)||n<1)return;
+ db.requirements.push({id:uid('r'),classId:cl.id,subjectId:s.id,teacherId:t.id,weeklyLessons:Math.floor(n),roomId:''});saveData();renderAll()}
+function renderAssignments(){document.getElementById('assignmentTable').innerHTML=db.requirements.length?'<div class="tablewrap"><table><tr><th>Class</th><th>Subject</th><th>Teacher</th><th>Weekly</th><th>Room</th><th>Actions</th></tr>'+db.requirements.map(function(r){return '<tr><td>'+esc(nameOf(db.classes,r.classId))+'</td><td>'+esc(nameOf(db.subjects,r.subjectId))+'</td><td>'+esc(nameOf(db.teachers,r.teacherId))+'</td><td><input type="number" min="1" value="'+r.weeklyLessons+'" style="width:80px" onchange="changeReq(\''+r.id+'\',this.value)"></td><td><select onchange="changeReqRoom(\''+r.id+'\',this.value)">'+opt(db.rooms,r.roomId,'Any room')+'</select></td><td><button class="btn small danger" onclick="delReq(\''+r.id+'\')">Delete</button></td></tr>'}).join('')+'</table></div>':'<div class="empty">No weekly requirements yet.</div>'}
+function changeReq(id,v){const r=db.requirements.find(function(x){return x.id===id});r.weeklyLessons=Math.max(1,parseInt(v)||1);saveData()}
+function changeReqRoom(id,v){db.requirements.find(function(x){return x.id===id}).roomId=v;saveData()}
+function delReq(id){db.requirements=db.requirements.filter(function(x){return x.id!==id});db.schedule=[];saveData();renderAll()}
 
 function addRoom(){const name=prompt('Room/Lab name');if(!name)return;db.rooms.push({id:uid('room'),name:name.trim(),type:''});saveData();renderAll()}
-function renderRooms(){const el=document.getElementById('roomTable');if(!el)return;el.innerHTML=db.rooms.length?`<table><tr><th>Room</th><th>Type</th><th></th></tr>${db.rooms.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.type||'')}</td><td><button class="btn small danger" onclick="delRoom('${r.id}')">Delete</button></td></tr>`).join('')}</table>`:'<div class="empty">No rooms. Requirements may use Any room.</div>'}
-function delRoom(id
+function renderRooms(){const el=document.getElementById('roomTable');if(!el)return;el.innerHTML=db.rooms.length?'<table><tr><th>Room</th><th>Type</th><th></th></tr>'+db.rooms.map(function(r){return '<tr><td>'+esc(r.name)+'</td><td>'+esc(r.type||'')+'</td><td><button class="btn small danger" onclick="delRoom(\''+r.id+'\')">Delete</button></td></tr>'}).join('')+'</table>':'<div class="empty">No rooms. Requirements may use Any room.</div>'}
+function delRoom(id){db.rooms=db.rooms.filter(function(x){return x.id!==id});db.requirements.forEach(function(r){if(r.roomId===id)r.roomId=''});db.schedule.forEach(function(x){if(x.roomId===id)x.roomId=''});saveData();renderAll()}
+
+function renderAvailability(){const rows=db.teachers.map(function(t){return '<tr><td><b>'+esc(t.name)+'</b></td>'+DAYS.map(function(d){return '<td>'+STRUCT[d].map(function(p){const k=t.id+'|'+d+'|'+p;const on=db.availability.some(function(a){return a.key===k});return '<label style="display:inline-flex;align-items:center;gap:2px;margin:2px;font-size:10px"><input type="
